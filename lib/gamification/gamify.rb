@@ -12,6 +12,7 @@ module Gamification
     module ClassMethods
 
       def gamify
+        include Achievements
         include Gamify::InstanceMethods
       end
 
@@ -19,11 +20,16 @@ module Gamification
 
     module InstanceMethods
 
-      delegate :has_achievement?, to: :include?
-
       def include?(*args)
         options = args.extract_options!
-        exists?(conditions: { _type: args.first.to_s }.merge(options))
+        self.class.exists?(conditions: { _type: args.first.to_s }.merge(options))
+      end
+
+      def has_achievement?(*args)
+        options = args.extract_options!
+        conditions = {_type: args.first.to_s, user_id: id}
+        conditions[:level] = options[:level] if options[:level]
+        achievements.where(conditions).present?
       end
 
       def award_achievement(*args)
@@ -38,7 +44,7 @@ module Gamification
       end
 
       def badges
-        self.uniq_achievements.values
+        uniq_achievements.values
       end
 
       def badges_in_progress

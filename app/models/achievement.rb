@@ -49,11 +49,7 @@ class Achievement
   end
 
   def self.current_level(user)
-    if current_achievement = user.achievements.where(_type: self.to_s).desc(:level).first
-      current_achievement.level
-    else
-      0
-    end
+    current_achievement = user.achievements.where(_type: self.to_s).desc(:level).first ? current_achievement.level : 0
   end
 
   def self.next_level(user)
